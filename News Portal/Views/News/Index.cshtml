@@ -1,0 +1,83 @@
+﻿@{
+    ViewData["Title"] = "Index";
+}
+
+<script type="text/javascript">
+
+    function add(id) {
+        node = document.createElement("p");
+        text = document.getElementById("com" + id).value;
+        var today = new Date();
+
+        var xhr = new XMLHttpRequest();
+        xhr.open("POST", "News/addComment?id=" + id + "&comment=" + text + "&date=" + today.toISOString(), false);
+        xhr.onload=function()
+        {
+          if(xhr.status==200)
+            resolve(xhr.response);
+          else
+            reject("error:"+xhr.status);
+        }
+        var obj = { id: id, comment: text };
+        var data = JSON.stringify(obj);
+        xhr.send(data);
+
+        document.getElementById("com" + id).value = "";
+        var date = ('0' + today.getDate()).slice(-2) + '.' + ('0' + (today.getMonth()+1)).slice(-2) + '.'  + today.getFullYear();
+        var time = ('0' + today.getHours()).slice(-2) + ":" + ('0' + today.getMinutes()).slice(-2) + ":" + ('0' + today.getSeconds()).slice(-2);
+        var dateTime = date + ' ' + time;
+
+        node.innerHTML = dateTime + ' ' + text;
+        document.getElementById(id).appendChild(node);
+
+        return true;
+    }
+
+</script>
+<body>
+    <div class="jumbotron" style="height:30px">
+        <h2>Latest news</h2>
+    </div>
+    
+    
+        @foreach (var news in ViewData["news"] as List<News>)
+        {
+        <div class="jumbotron">
+            <table>
+                <tr style="height: 50px">
+                    <td align="center" valign="middle" style="font-size: 24px; font-weight: bold;"><p>@news.Title</p></td>
+                    <td rowspan="3">
+                        <img src="@String.Format("data:image/png;base64,{0}", Convert.ToBase64String(news.Image))" />
+                    </td>
+                </tr>
+                <tr>
+                    <td valign="top" style="font-size: 20px">@news.Text</td>
+                </tr>
+                <tr>
+                    <td valign="bottom" style="font-size: 20px">Author: @news.Author</td>
+                </tr>
+                <tr>
+                    <td valign="bottom" style="font-size: 20px">Published on: @news.Date.ToString("dd.MM.yyyy HH:mm:ss")</td>
+                </tr>
+                <tr><td>&nbsp;</td></tr>
+                <tr style="padding-top: 20px"><td style="font-size: 20px">comments:</td></tr>
+                <tr>
+                    <td colspan="2" id="@news.Id">
+                        @foreach (var com in news.Comment)
+                        {
+                            <p>@(DateTime.Parse(com["date"].ToString()).ToString("dd.MM.yyyy HH:mm:ss") + " " + com["comment"])</p>
+                        }
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <p><input type="text" id="@("com" + news.Id)" name="comment" placeholder="Your comment" size="50" /><input type="submit" value="Add comment" onclick="add('@news.Id')" /></p>
+                    </td>
+                </tr>
+            </table>
+</div>
+        }
+     
+</body>
+
+

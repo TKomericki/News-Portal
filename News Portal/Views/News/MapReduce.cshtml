@@ -1,0 +1,31 @@
+﻿
+@{
+    ViewData["Title"] = "MapReduce";
+}
+@using MongoDB.Bson;
+
+<h1>MapReduce</h1>
+<body>
+    <h3>MR1:</h3>
+    <ul>
+        @foreach (var res in ViewData["MR1"] as List<BsonDocument>)
+        {
+            <li>@(res["_id"] + ": " + res["value"])</li>
+        }
+    </ul>
+    <h3>MR2:</h3>
+    <ul>
+        @foreach (var res in ViewData["MR2"] as List<BsonDocument>)
+        {
+            <li>@(Math.Truncate(res["value"].ToDecimal() * 10000m) / 10000m)</li>
+        }
+    </ul>
+    <h3>MR3:</h3>
+    <ul>
+        @foreach (var res in ViewData["MR3"] as List<BsonDocument>)
+        {
+            <li>@(res["_id"] + ": " + res["value"])</li>
+        }
+    </ul>
+</body>
+
